@@ -1,8 +1,12 @@
 package dev.redlab.rshb.testapp.service;
 
 import dev.redlab.rshb.testapp.TestappPostgresqlContainer;
+import dev.redlab.rshb.testapp.dao.entity.Account;
 import dev.redlab.rshb.testapp.dao.entity.Transaction;
+import dev.redlab.rshb.testapp.dao.entity.TransactionDeposit;
+import dev.redlab.rshb.testapp.dao.repository.TransactionDepositRepository;
 import dev.redlab.rshb.testapp.dao.repository.TransactionRepository;
+import dev.redlab.rshb.testapp.dto.request.DepositRequest;
 import lombok.extern.log4j.Log4j2;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -15,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -36,6 +42,12 @@ public class TransactionServiceTest {
     @Autowired
     private TransactionRepository transactionRepository;
 
+    @Autowired
+    private TransactionDepositRepository transactionDepositRepository;
+
+    @Autowired
+    private TestSupport testSupport;
+
     @Test
     @Transactional
     public void testNewTransaction() {
@@ -43,6 +55,50 @@ public class TransactionServiceTest {
 
         Optional<Transaction> transaction2 = transactionRepository.findById(transaction.getId());
         assertThat(transaction2.orElseThrow().getId(), equalTo(transaction.getId()));
+    }
+
+    @Test
+    @Transactional
+    public void testDeposit() {
+        Account account = testSupport.createAccount("Account for deposit").get(0);
+        Transaction transaction = transactionService.newTransaction();
+        Account account2 = transactionService.deposit(DepositRequest.builder()
+                .transactionId(transaction.getId())
+                .accountId(account.getId())
+                .deposit(BigDecimal.TEN)
+                .build());
+
+        Optional<TransactionDeposit> transaction2 = transactionDepositRepository.findById(transaction.getId());
+        assertThat(transaction2.orElseThrow().getId(), equalTo(transaction.getId()));
+        assertThat(transaction2.orElseThrow().getAccountId(), equalTo(account.getId()));
+        assertThat(transaction2.orElseThrow().getAmount(), equalTo(BigDecimal.TEN));
+
+        assertThat(account2.getBalance(), equalTo(BigDecimal.TEN));
+    }
+
+    @Test
+    @Transactional
+    public void testDepositTwice() {
+        Account account = testSupport.createAccount("Account for deposit").get(0);
+        Transaction transaction = transactionService.newTransaction();
+        Account account2 = transactionService.deposit(DepositRequest.builder()
+                .transactionId(transaction.getId())
+                .accountId(account.getId())
+                .deposit(BigDecimal.TEN)
+                .build());
+        Account account3 = transactionService.deposit(DepositRequest.builder()
+                .transactionId(transaction.getId())
+                .accountId(account.getId())
+                .deposit(BigDecimal.TEN)
+                .build());
+
+        Optional<TransactionDeposit> transaction2 = transactionDepositRepository.findById(transaction.getId());
+        assertThat(transaction2.orElseThrow().getId(), equalTo(transaction.getId()));
+        assertThat(transaction2.orElseThrow().getAccountId(), equalTo(account.getId()));
+        assertThat(transaction2.orElseThrow().getAmount(), equalTo(BigDecimal.TEN));
+
+        assertThat(account2.getBalance(), equalTo(BigDecimal.TEN));
+        assertThat(account3.getBalance(), equalTo(BigDecimal.TEN));
     }
 
 }
