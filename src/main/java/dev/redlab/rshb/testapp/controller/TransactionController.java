@@ -3,6 +3,7 @@ package dev.redlab.rshb.testapp.controller;
 import dev.redlab.rshb.testapp.dao.entity.Account;
 import dev.redlab.rshb.testapp.dao.entity.Transaction;
 import dev.redlab.rshb.testapp.dto.request.DepositRequest;
+import dev.redlab.rshb.testapp.dto.request.WithdrawRequest;
 import dev.redlab.rshb.testapp.service.TransactionService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -31,6 +32,11 @@ public class TransactionController {
     @PutMapping("/deposit")
     public ResponseEntity<Account> deposit(@Valid @RequestBody DepositRequest request) {
         return ResponseEntity.ok(transactionService.deposit(request));
+    }
+
+    @PutMapping("/withdraw")
+    public ResponseEntity<Account> deposit(@Valid @RequestBody WithdrawRequest request) {
+        return ResponseEntity.ok(transactionService.withdraw(request));
     }
 
 }
