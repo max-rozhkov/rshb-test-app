@@ -9,7 +9,7 @@
 
 Requirements: docker
 
-Run build:
+Build the app:
 
     # mvn clean install
 
