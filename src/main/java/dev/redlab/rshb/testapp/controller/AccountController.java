@@ -25,9 +25,9 @@ public class AccountController {
         this.accountService = accountService;
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<Account> getUserInfoById(@PathVariable long userId) {
-        Account response = accountService.getAccountInfo(userId);
+    @GetMapping("/{accountId}")
+    public ResponseEntity<Account> getUserInfoById(@PathVariable long accountId) {
+        Account response = accountService.getAccountInfo(accountId);
         return ResponseEntity.ok(response);
     }
 
@@ -36,4 +36,5 @@ public class AccountController {
         accountService.createAccount(request);
         return ResponseEntity.ok().build();
     }
+
 }
