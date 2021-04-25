@@ -3,25 +3,22 @@ package dev.redlab.rshb.testapp.dao.entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 @Entity
-@Table(name = "accounts")
+@Table(name = "transactions")
 @Data
 @NoArgsConstructor
-public class Account {
+public class Transaction {
 
     @Id
     @SequenceGenerator(name = "main_seq", sequenceName = "main_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "main_seq")
     private Long id;
-
-    @Column(name = "name")
-    private String name;
-
-    @Column(name = "balance")
-    private BigDecimal balance;
 
 }
