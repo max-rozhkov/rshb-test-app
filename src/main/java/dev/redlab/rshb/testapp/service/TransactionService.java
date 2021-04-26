@@ -68,7 +68,7 @@ public class TransactionService {
         Account account = accountRepository.findById(request.getAccountId()).orElseThrow();
         if (transaction.isEmpty()) {
             if (account.getBalance().subtract(request.getWithdraw()).doubleValue() < 0) {
-                throw new NotEnoughOnBalanceException("Not enough on balance");
+                throw new NotEnoughOnBalanceException("Not enough money on balance");
             }
 
             TransactionWithdraw transactionWithdraw = new TransactionWithdraw();
