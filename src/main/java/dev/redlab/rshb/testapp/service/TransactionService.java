@@ -15,6 +15,7 @@ import dev.redlab.rshb.testapp.dto.request.WithdrawRequest;
 import dev.redlab.rshb.testapp.exceptions.NotEnoughOnBalanceException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -38,7 +39,7 @@ public class TransactionService {
         return transactionRepository.save(new Transaction());
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public Account deposit(DepositRequest request) {
         Optional<TransactionDeposit> transaction = transactionDepositRepository.findById(request.getTransactionId());
         Account account = accountRepository.findById(request.getAccountId()).orElseThrow();
@@ -61,7 +62,7 @@ public class TransactionService {
         return account;
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public Account withdraw(WithdrawRequest request) {
         Optional<TransactionWithdraw> transaction = transactionWithdrawRepository.findById(request.getTransactionId());
         Account account = accountRepository.findById(request.getAccountId()).orElseThrow();
@@ -82,7 +83,7 @@ public class TransactionService {
             Log log = new Log();
             log.setAccountId(request.getAccountId());
             log.setCreateDate(LocalDateTime.now());
-            log.setMessage("Withdraw " + request.getWithdraw() + " to account " + account.getName());
+            log.setMessage("Withdraw " + request.getWithdraw() + " from account " + account.getName());
             logRepository.save(log);
         }
         return account;
